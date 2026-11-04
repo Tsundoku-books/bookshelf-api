@@ -1,9 +1,5 @@
 # CLAUDE.md — BookShelf API
 
-> **Respond to the user in Brazilian Portuguese (pt-BR).**
-> All code, comments, identifiers, commit messages, API messages, and docs stay in
-> **English** — only the chat replies are in pt-BR.
-
 ## What this is
 
 REST API for a personal book library. Node.js + TypeScript + Express + TypeORM +
@@ -55,8 +51,6 @@ tests/          Jest + Supertest API tests against a real PostgreSQL
 - **Controllers:** a plain object of async methods. Read the user id as
   `req.userId as string`. Shape the response: `{ message, <resource> }` for
   mutations, `{ <resource> }` / `{ <resource>s, pagination }` for reads.
-- **Comments:** only when they explain *why* (a workaround, a non-obvious
-  constraint). Delete comments that restate the code.
 - **`sortBy` / dynamic column names:** must go through an allow-list
   (`SORTABLE_COLUMNS`) before touching a query.
 - **Swagger:** every route gets a `@swagger` JSDoc block above it.
@@ -77,10 +71,7 @@ CI (`.github/workflows/ci.yml`) runs lint + typecheck + tests (Postgres service,
 
 ## Git & releases
 
-- **Conventional Commits**, in English, following the existing `type(scope): ...`
-  style. **Never** add `Co-Authored-By`, `Claude-Session`, or any AI-attribution
-  trailer to commits or PRs.
-- Do not commit or push unless the user asks.
+- Conventional Commits (`type(scope): ...`), matching the existing history.
 - `main` **auto-deploys to Render**. A breaking API change also affects the
   deployed frontend — flag it.
 - Versioning: SemVer + [Keep a Changelog](https://keepachangelog.com). Keep
@@ -89,11 +80,7 @@ CI (`.github/workflows/ci.yml`) runs lint + typecheck + tests (Postgres service,
 
 ## Gotchas
 
-- No local PostgreSQL / Docker on the current machine — tests only run in CI.
-  See the `db-and-tests` skill.
-- The `gh` CLI here is authenticated as a **read-only** account; it cannot open
-  PRs, merge, or create Releases on `bookshelf-web/bookshelf-api`. Pushes work
-  over SSH.
+- Running the tests needs PostgreSQL; see the `db-and-tests` skill.
 - `main` protection is defined in `.github/rulesets/protect-main.json` but has to be imported by a repo
   admin (*Settings → Rules → Rulesets → Import*); the `gh` account here cannot apply it.
 - Schema changes need a migration in `src/migrations` (`npm run migration:generate`); `DB_SYNC` no longer
