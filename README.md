@@ -11,7 +11,7 @@ Express, TypeORM and PostgreSQL.
 
 - **Live API:** <https://bookshelf-api-wfzs.onrender.com> (Swagger UI at `/api-docs`)
 - **Frontend:** [bookshelf-frontend](https://github.com/bookshelf-web/bookshelf-frontend),
-  live at <https://bookshelf-web.github.io/bookshelf-frontend/>
+  live at <https://tsundoku-books.github.io/bookshelf-frontend/>
 
 > The demo runs on Render's free tier and sleeps when idle, so the first request
 > after a period of inactivity can take up to a minute.
