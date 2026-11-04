@@ -40,3 +40,10 @@ jobs:
 
       - name: Check the frontend
         run: curl --fail --silent --show-error --retry 3 --max-time 30 --output /dev/null "$FRONTEND_URL"
+
+      - name: Check the published bundle targets the API
+        run: |
+          js=$(curl --fail --silent --retry 3 --max-time 30 "$FRONTEND_URL" | grep -o 'assets/index-[^"]*\.js' | head -1)
+          [ -n "$js" ] || { echo "::error::Main bundle not found in the published page"; exit 1; }
+          curl --fail --silent --retry 3 --max-time 30 "${FRONTEND_URL}${js}" | grep -q "$API_URL" \
+            || { echo "::error::Published bundle does not reference $API_URL"; exit 1; }
