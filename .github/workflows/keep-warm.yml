@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 5
     env:
       API_URL: https://bookshelf-api-wfzs.onrender.com
-      FRONTEND_URL: https://bookshelf-web.github.io/bookshelf-frontend/
+      FRONTEND_URL: https://tsundoku-books.github.io/bookshelf-frontend/
     steps:
       - name: Wake the API (cold starts can take a minute)
         run: |
