@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-This project is pre-1.0; only the latest `main` receives fixes.
+This project is pre-1.0; only the latest `master` receives fixes.
 
 ## Reporting a vulnerability
 

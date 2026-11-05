@@ -72,7 +72,7 @@ CI (`.github/workflows/ci.yml`) runs lint + typecheck + tests (Postgres service,
 ## Git & releases
 
 - Conventional Commits (`type(scope): ...`), matching the existing history.
-- `main` **auto-deploys to Render**. A breaking API change also affects the
+- `master` **auto-deploys to Render**. A breaking API change also affects the
   deployed frontend — flag it.
 - Versioning: SemVer + [Keep a Changelog](https://keepachangelog.com). Keep
   `CHANGELOG.md`'s `[Unreleased]` section current; releases are cut from `v*` tags
@@ -81,7 +81,7 @@ CI (`.github/workflows/ci.yml`) runs lint + typecheck + tests (Postgres service,
 ## Gotchas
 
 - Running the tests needs PostgreSQL; see the `db-and-tests` skill.
-- `main` protection is defined in `.github/rulesets/protect-main.json` but has to be imported by a repo
+- `master` protection is defined in `.github/rulesets/protect-master.json` but has to be imported by a repo
   admin (*Settings → Rules → Rulesets → Import*); the `gh` account here cannot apply it.
 - Schema changes need a migration in `src/migrations` (`npm run migration:generate`); `DB_SYNC` no longer
   exists. Migrations run on startup outside `NODE_ENV=test`.

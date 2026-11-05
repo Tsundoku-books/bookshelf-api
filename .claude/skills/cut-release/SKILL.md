@@ -52,7 +52,7 @@ chore(release): vX.Y.Z
 
 ```
 git tag -a vX.Y.Z -m "vX.Y.Z"
-git push origin main   # only if the user asked to push
+git push origin master   # only if the user asked to push
 git push origin vX.Y.Z
 ```
 
@@ -76,7 +76,7 @@ gh release create vX.Y.Z --title "vX.Y.Z" --notes-file <changelog section> --pre
 
 ## 7. After release
 
-- `main` auto-deploys to Render — verify `https://<render-url>/health` and, for a
+- `master` auto-deploys to Render — verify `https://<render-url>/health` and, for a
   contract change, hit one endpoint to confirm the new behavior is live.
 - If the API contract changed, remind the user the `bookshelf-frontend` repo
   needs a matching update.

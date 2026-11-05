@@ -249,8 +249,8 @@ Commit messages follow [Conventional Commits](https://www.conventionalcommits.or
 Notable changes are tracked in [CHANGELOG.md](CHANGELOG.md); to report a security
 issue, see [SECURITY.md](SECURITY.md).
 
-Repository maintainers can import [`.github/rulesets/protect-main.json`](.github/rulesets/protect-main.json)
-(*Settings → Rules → Rulesets → Import*) to block force pushes to, and deletion of, `main`.
+Repository maintainers can import [`.github/rulesets/protect-master.json`](.github/rulesets/protect-master.json)
+(*Settings → Rules → Rulesets → Import*) to block force pushes to, and deletion of, `master`.
 
 ## License
 
