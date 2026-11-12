@@ -144,7 +144,7 @@ describeMigrations('database migrations', () => {
     const db = await createScratchDatabase();
     await db.runMigrations();
 
-    for (let i = 0; i < 6; i++) await db.undoLastMigration();
+    for (let i = 0; i < 7; i++) await db.undoLastMigration();
 
     const tables: { table_name: string }[] = await db.query(
       `SELECT table_name FROM information_schema.tables
