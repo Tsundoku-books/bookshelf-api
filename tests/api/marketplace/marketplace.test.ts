@@ -469,6 +469,25 @@ describe('marketplace', () => {
       expect(still.body.order.status).toBe('awaiting_payment');
     });
 
+    it('rejects a body that parses to the signed event but was not sent byte for byte', async () => {
+      const { chargeId, buyer, orderId } = await pendingPix();
+      const timestamp = Math.floor(Date.now() / 1000);
+      const secret = createHmac('sha256', env.JWT_SECRET).update('payments-webhook').digest('hex');
+      const signed = JSON.stringify({ chargeId, status: 'paid' });
+      const sent = JSON.stringify({ chargeId, status: 'paid' }, null, 2);
+
+      const response = await request(app)
+        .post('/api/payments/webhook')
+        .set('Content-Type', 'application/json')
+        .set('X-Simulated-Timestamp', String(timestamp))
+        .set('X-Simulated-Signature', signWebhook(secret, timestamp, signed))
+        .send(sent);
+
+      expect(response.status).toBe(403);
+      const still = await buyer.api.call('get', `/marketplace/orders/${orderId}`);
+      expect(still.body.order.status).toBe('awaiting_payment');
+    });
+
     it('rejects a payload that is not a valid event', async () => {
       const timestamp = Math.floor(Date.now() / 1000);
       const secret = createHmac('sha256', env.JWT_SECRET).update('payments-webhook').digest('hex');

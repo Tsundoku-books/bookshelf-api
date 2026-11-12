@@ -47,8 +47,9 @@ export function toChargeView(charge: PaymentCharge): ChargeView {
   };
 }
 
-/** The webhook key is derived from the JWT secret, so there is no extra secret to configure. */
-const webhookSecret = (): string => createHmac('sha256', env.JWT_SECRET).update('payments-webhook').digest('hex');
+/** A dedicated secret when configured; otherwise derived from the JWT secret so no setup is required. */
+const webhookSecret = (): string =>
+  env.PAYMENTS_WEBHOOK_SECRET ?? createHmac('sha256', env.JWT_SECRET).update('payments-webhook').digest('hex');
 
 export class PaymentsService {
   private static paidListeners: ChargePaidListener[] = [];

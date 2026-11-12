@@ -115,6 +115,12 @@ describe('env', () => {
     ).toBe(true);
   });
 
+  it('accepts only a long dedicated webhook secret', () => {
+    expect(loadEnv().env.PAYMENTS_WEBHOOK_SECRET).toBeUndefined();
+    expect(() => loadEnv({ PAYMENTS_WEBHOOK_SECRET: 'short' })).toThrow('process.exit');
+    expect(loadEnv({ PAYMENTS_WEBHOOK_SECRET: 'w'.repeat(32) }).env.PAYMENTS_WEBHOOK_SECRET).toBe('w'.repeat(32));
+  });
+
   it('keeps the API docs on unless turned off', () => {
     expect(loadEnv().env.apiDocsEnabled).toBe(true);
     expect(loadEnv({ API_DOCS_ENABLED: 'false' }).env.apiDocsEnabled).toBe(false);

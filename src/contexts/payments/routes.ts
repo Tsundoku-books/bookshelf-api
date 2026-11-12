@@ -27,7 +27,10 @@ paymentsRoutes.post(
     const signature = req.header('x-simulated-signature');
     if (!signature) throw new BadRequestError('Missing webhook signature', 'INVALID_SIGNATURE');
 
-    const result = await PaymentsService.handleWebhook(JSON.stringify(req.body), timestamp, signature);
+    // The signature covers the bytes that were sent, not a re-serialisation of the parsed JSON.
+    if (!req.rawBody) throw new BadRequestError('Webhook body must be JSON', 'INVALID_WEBHOOK');
+
+    const result = await PaymentsService.handleWebhook(req.rawBody.toString('utf8'), timestamp, signature);
     res.json({ result });
   }),
 );

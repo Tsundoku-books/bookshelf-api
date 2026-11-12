@@ -32,6 +32,8 @@ const envSchema = z
     ADMIN_EMAILS: z.string().optional(),
     // The only payment gateway is a simulator; production must opt in explicitly (demo deployments only).
     ALLOW_SIMULATED_PAYMENTS: z.enum(['true', 'false']).default('false'),
+    // Signs payment webhooks. Falls back to a key derived from JWT_SECRET so existing deployments keep working.
+    PAYMENTS_WEBHOOK_SECRET: z.string().min(32, 'PAYMENTS_WEBHOOK_SECRET must have at least 32 characters').optional(),
     // Swagger UI is part of the public demo, so it stays on unless explicitly turned off.
     API_DOCS_ENABLED: z.enum(['true', 'false']).default('true'),
     // PEM of the CA that signs the database certificate; enables full verification of the connection.

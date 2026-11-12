@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { env } from './config/env';
@@ -29,7 +29,14 @@ app.use(
   }),
 );
 
-app.use(express.json({ limit: '100kb' }));
+app.use(
+  express.json({
+    limit: '100kb',
+    verify: (req, _res, buf) => {
+      if ((req as Request).originalUrl.startsWith('/api/payments/webhook')) (req as Request).rawBody = buf;
+    },
+  }),
+);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
