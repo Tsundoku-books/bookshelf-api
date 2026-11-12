@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is stored as `https`. `javascript:`, `data:` and similar are rejected.
 - New `DATABASE_CA_CERT` setting verifies the database server certificate; production logs a warning while it
   is unset. New `API_DOCS_ENABLED=false` hides Swagger UI (on by default, as the README advertises it).
+- The payment webhook signature now covers the exact bytes received instead of a re-serialised copy of the
+  parsed JSON, and `PAYMENTS_WEBHOOK_SECRET` can replace the key derived from `JWT_SECRET`.
 - Dependencies updated with `npm audit fix` (including `proxy-addr`, `body-parser`, `brace-expansion`).
 
 ### Added

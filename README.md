@@ -85,6 +85,7 @@ npm run build && npm start   # production build
 | `DB_NAME`        | yes, unless `DATABASE_URL`  | –             | |
 | `DATABASE_CA_CERT` | no                        | –             | PEM of the CA that signs the database certificate (Supabase: its root CA). Set it to verify the server; without it the connection is encrypted but unverified, and production logs a warning. A one-line PEM with `
 ` sequences works |
+| `PAYMENTS_WEBHOOK_SECRET` | no                | derived from `JWT_SECRET` | at least 32 characters; signs the payment webhook |
 | `API_DOCS_ENABLED` | no                        | `true`        | `false` hides Swagger UI (`/api-docs`) |
 | `CORS_ORIGIN`    | no                          | localhost set | comma-separated list of allowed origins |
 | `ADMIN_EMAILS`   | no                          | –             | comma-separated emails granted `admin` at register/login; meant to bootstrap the first admin, then manage users at `/admin/users` |
