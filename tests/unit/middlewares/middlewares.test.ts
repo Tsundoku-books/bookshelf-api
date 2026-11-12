@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { QueryFailedError } from 'typeorm';
 import { z } from 'zod';
 import { authMiddleware } from '../../../src/middlewares/authMiddleware';
@@ -12,6 +12,8 @@ import {
   UnauthorizedError,
   ValidationError,
 } from '../../../src/shared/errors';
+import { IdentityDirectory } from '../../../src/contexts/identity/directory';
+import { UserStatus } from '../../../src/contexts/identity/models/User';
 import { signAuthToken } from '../../../src/shared/jwt';
 import { Role } from '../../../src/shared/roles';
 
@@ -30,44 +32,64 @@ function mockRes() {
 }
 
 describe('authMiddleware', () => {
-  const next = jest.fn() as NextFunction;
+  const accountState = jest.spyOn(IdentityDirectory, 'accountState');
 
-  it('rejects a request without a token', () => {
-    expect(() => authMiddleware(mockReq(), mockRes(), next)).toThrow(UnauthorizedError);
-    try {
-      authMiddleware(mockReq(), mockRes(), next);
-    } catch (error) {
-      expect((error as UnauthorizedError).code).toBe('TOKEN_MISSING');
-    }
+  beforeEach(() => accountState.mockReset());
+
+  async function run(req: Request) {
+    const next = jest.fn();
+    await authMiddleware(req, mockRes(), next);
+    return next;
+  }
+
+  const errorOf = (next: jest.Mock) => next.mock.calls[0][0] as UnauthorizedError;
+
+  it('rejects a request without a token', async () => {
+    const next = await run(mockReq());
+
+    expect(errorOf(next)).toBeInstanceOf(UnauthorizedError);
+    expect(errorOf(next).code).toBe('TOKEN_MISSING');
   });
 
-  it.each(['Token abc', 'Bearer', 'abc'])('rejects the malformed header "%s"', header => {
-    const req = mockReq({ headers: { authorization: header } });
-    try {
-      authMiddleware(req, mockRes(), next);
-      throw new Error('should have thrown');
-    } catch (error) {
-      expect((error as UnauthorizedError).code).toBe('TOKEN_MALFORMED');
-    }
+  it.each(['Token abc', 'Bearer', 'abc'])('rejects the malformed header "%s"', async header => {
+    const next = await run(mockReq({ headers: { authorization: header } }));
+
+    expect(errorOf(next).code).toBe('TOKEN_MALFORMED');
   });
 
-  it('rejects an invalid token', () => {
-    const req = mockReq({ headers: { authorization: 'Bearer nope' } });
+  it('rejects an invalid token', async () => {
+    const next = await run(mockReq({ headers: { authorization: 'Bearer nope' } }));
 
-    expect(() => authMiddleware(req, mockRes(), next)).toThrow(UnauthorizedError);
+    expect(errorOf(next)).toBeInstanceOf(UnauthorizedError);
+    expect(accountState).not.toHaveBeenCalled();
   });
 
-  it('exposes the user id and roles on the request', () => {
-    const nextFn = jest.fn();
-    const req = mockReq({
-      headers: { authorization: `Bearer ${signAuthToken('user-9', [Role.BUYER])}` },
-    });
+  it('takes the roles from the database, not from the token', async () => {
+    accountState.mockResolvedValue({ id: 'user-9', roles: [Role.BUYER], status: UserStatus.ACTIVE });
+    const req = mockReq({ headers: { authorization: `Bearer ${signAuthToken('user-9', [Role.READER, Role.ADMIN])}` } });
 
-    authMiddleware(req, mockRes(), nextFn);
+    const next = await run(req);
 
     expect(req.userId).toBe('user-9');
     expect(req.userRoles).toEqual([Role.BUYER]);
-    expect(nextFn).toHaveBeenCalledTimes(1);
+    expect(next).toHaveBeenCalledWith();
+  });
+
+  it('rejects a token whose account no longer exists', async () => {
+    accountState.mockResolvedValue(null);
+
+    const next = await run(mockReq({ headers: { authorization: `Bearer ${signAuthToken('gone')}` } }));
+
+    expect(errorOf(next).code).toBe('INVALID_TOKEN');
+  });
+
+  it('rejects a suspended account even though its token is still valid', async () => {
+    accountState.mockResolvedValue({ id: 'u1', roles: [Role.READER], status: UserStatus.SUSPENDED });
+
+    const next = await run(mockReq({ headers: { authorization: `Bearer ${signAuthToken('u1')}` } }));
+
+    expect(next.mock.calls[0][0]).toBeInstanceOf(ForbiddenError);
+    expect((next.mock.calls[0][0] as ForbiddenError).code).toBe('ACCOUNT_SUSPENDED');
   });
 });
 

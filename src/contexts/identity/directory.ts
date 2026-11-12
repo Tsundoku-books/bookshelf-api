@@ -11,6 +11,11 @@ export class IdentityDirectory {
     return new Map(users.map(user => [user.id, user.name]));
   }
 
+  /** What the auth middleware needs on every request; null when the account no longer exists. */
+  static async accountState(id: string): Promise<Pick<User, 'id' | 'roles' | 'status'> | null> {
+    return AppDataSource.getRepository(User).findOne({ where: { id }, select: { id: true, roles: true, status: true } });
+  }
+
   static async companyNames(ids: string[]): Promise<Map<string, string>> {
     if (ids.length === 0) return new Map();
     const companies = await AppDataSource.getRepository(Company).find({ where: { id: In(ids) } });

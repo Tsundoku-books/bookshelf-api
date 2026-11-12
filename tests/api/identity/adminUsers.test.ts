@@ -135,6 +135,29 @@ describe('admin: users', () => {
       expect(allowed.status).toBe(200);
     });
 
+    it('cuts off the token of a suspended account at once', async () => {
+      const admin = await signUp({ email: ADMIN_EMAIL });
+      const target = await signUp();
+      expect((await target.api.call('get', '/books')).status).toBe(200);
+
+      await admin.api.call('patch', `/admin/users/${target.user.id}`, { status: 'suspended' });
+      const response = await target.api.call('get', '/books');
+
+      expect(response.status).toBe(403);
+      expect(response.body.code).toBe('ACCOUNT_SUSPENDED');
+    });
+
+    it('applies a role change to tokens issued before it', async () => {
+      const admin = await signUp({ email: ADMIN_EMAIL });
+      const target = await signUp();
+
+      await admin.api.call('patch', `/admin/users/${target.user.id}`, { roles: ['buyer'] });
+      const response = await target.api.call('get', '/books');
+
+      expect(response.status).toBe(403);
+      expect(response.body.code).toBe('ROLE_REQUIRED');
+    });
+
     it('does not reveal a suspension to someone with the wrong password', async () => {
       const admin = await signUp({ email: ADMIN_EMAIL });
       const target = await signUp();
