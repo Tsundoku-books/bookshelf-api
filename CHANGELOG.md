@@ -20,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Rate limiting (production only):** a general limit of 600 requests per 15 minutes on `/api`, counted per
   signed-in user (per IP otherwise), plus 10 login attempts per email and 5 password changes per user.
   Sign-ups per IP went from 3 to 10 per hour.
+- Login takes as long for an unknown email as for a wrong password, so response time no longer reveals which
+  emails have an account.
+- Cover URLs (books and admin catalog edits) must be `http(s)` links of at most 500 characters; plain `http`
+  is stored as `https`. `javascript:`, `data:` and similar are rejected.
+- New `DATABASE_CA_CERT` setting verifies the database server certificate; production logs a warning while it
+  is unset. New `API_DOCS_ENABLED=false` hides Swagger UI (on by default, as the README advertises it).
 - Dependencies updated with `npm audit fix` (including `proxy-addr`, `body-parser`, `brace-expansion`).
 
 ### Added

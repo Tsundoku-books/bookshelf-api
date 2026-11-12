@@ -75,7 +75,7 @@ npm run build && npm start   # production build
 |------------------|-----------------------------|---------------|-------|
 | `NODE_ENV`       | no                          | `development` | `development` \| `test` \| `production` |
 | `PORT`           | no                          | `3000`        | |
-| `JWT_SECRET`     | yes                         | –             | ≥ 32 chars recommended in production |
+| `JWT_SECRET`     | yes                         | –             | at least 32 characters in production (startup fails otherwise) |
 | `JWT_EXPIRES_IN` | no                          | `7d`          | |
 | `DATABASE_URL`   | yes, unless `DB_*` are set  | –             | hosted providers (Supabase/Render); implies SSL |
 | `DB_HOST`        | yes, unless `DATABASE_URL`  | –             | |
@@ -83,6 +83,9 @@ npm run build && npm start   # production build
 | `DB_USER`        | yes, unless `DATABASE_URL`  | –             | |
 | `DB_PASSWORD`    | yes, unless `DATABASE_URL`  | –             | |
 | `DB_NAME`        | yes, unless `DATABASE_URL`  | –             | |
+| `DATABASE_CA_CERT` | no                        | –             | PEM of the CA that signs the database certificate (Supabase: its root CA). Set it to verify the server; without it the connection is encrypted but unverified, and production logs a warning. A one-line PEM with `
+` sequences works |
+| `API_DOCS_ENABLED` | no                        | `true`        | `false` hides Swagger UI (`/api-docs`) |
 | `CORS_ORIGIN`    | no                          | localhost set | comma-separated list of allowed origins |
 | `ADMIN_EMAILS`   | no                          | –             | comma-separated emails granted `admin` at register/login; meant to bootstrap the first admin, then manage users at `/admin/users` |
 | `ALLOW_SIMULATED_PAYMENTS` | no             | `false`       | payments are simulated only; outside production they are always on, in production they answer `503` unless this is `true` (demo deployments) |
