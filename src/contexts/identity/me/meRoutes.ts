@@ -1,5 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { authMiddleware } from '../../../middlewares/authMiddleware';
+import { createRateLimiter, userOrIpKey } from '../../../middlewares/rateLimit';
 import { validate } from '../../../middlewares/validate';
 import { asyncHandler } from '../../../shared/asyncHandler';
 import { MeService } from './meService';
@@ -8,6 +9,13 @@ import { changePasswordSchema, updateProfileSchema, updateRolesSchema } from './
 const router = Router();
 
 router.use(authMiddleware);
+
+const passwordChangeLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Too many password change attempts. Please try again later.',
+  keyGenerator: userOrIpKey,
+});
 
 const userId = (req: Request): string => req.userId as string;
 
@@ -61,6 +69,7 @@ router.patch(
  */
 router.patch(
   '/password',
+  passwordChangeLimiter,
   validate({ body: changePasswordSchema }),
   asyncHandler(async (req: Request, res: Response) => {
     await MeService.changePassword(userId(req), req.body);

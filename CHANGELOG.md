@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and verified with HS256 only.
 - **Breaking:** passwords need 8 to 72 bytes on register and password change (bcrypt ignores anything past 72).
   Existing accounts with shorter passwords can still sign in.
+- **Rate limiting (production only):** a general limit of 600 requests per 15 minutes on `/api`, counted per
+  signed-in user (per IP otherwise), plus 10 login attempts per email and 5 password changes per user.
+  Sign-ups per IP went from 3 to 10 per hour.
 - Dependencies updated with `npm audit fix` (including `proxy-addr`, `body-parser`, `brace-expansion`).
 
 ### Added

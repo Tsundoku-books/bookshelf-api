@@ -1,33 +1,29 @@
 import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
-import { env } from '../../../config/env';
 import { asyncHandler } from '../../../shared/asyncHandler';
+import { createRateLimiter, emailKey } from '../../../middlewares/rateLimit';
 import { validate } from '../../../middlewares/validate';
 import { authController } from './authController';
 import { loginSchema, registerSchema } from './authSchemas';
 
 const router = Router();
 
-// Brute-force protection. Only active in production so it never interferes with
-// local development or the test suite.
-const productionOnly = () => env.NODE_ENV !== 'production';
-
-const loginLimiter = rateLimit({
+const loginLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
   max: 5,
-  message: { error: 'Too many login attempts. Please try again later.', code: 'RATE_LIMITED' },
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: productionOnly,
+  message: 'Too many login attempts. Please try again later.',
 });
 
-const registerLimiter = rateLimit({
+const loginByEmailLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: 'Too many login attempts. Please try again later.',
+  keyGenerator: emailKey,
+});
+
+const registerLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000,
-  max: 3,
-  message: { error: 'Too many accounts created. Please try again later.', code: 'RATE_LIMITED' },
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: productionOnly,
+  max: 10,
+  message: 'Too many accounts created. Please try again later.',
 });
 
 /**
@@ -84,6 +80,7 @@ router.post(
 router.post(
   '/login',
   loginLimiter,
+  loginByEmailLimiter,
   validate({ body: loginSchema }),
   asyncHandler(authController.login),
 );
