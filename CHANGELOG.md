@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **Sessions follow the account:** the auth middleware reads status and roles from the database on every
+  request, so suspending, deleting or demoting an account takes effect at once instead of when its token expires.
+- Emails in `ADMIN_EMAILS` cannot be registered in production (emails are not verified), so nobody can claim
+  an admin address that has no account yet. Existing accounts are still promoted on login.
+- `JWT_SECRET` must have at least 32 characters in production (startup fails otherwise) and tokens are signed
+  and verified with HS256 only.
+- **Breaking:** passwords need 8 to 72 bytes on register and password change (bcrypt ignores anything past 72).
+  Existing accounts with shorter passwords can still sign in.
+- Dependencies updated with `npm audit fix` (including `proxy-addr`, `body-parser`, `brace-expansion`).
+
 ### Added
 
 - **Terms acceptance:** `POST /api/auth/register` now requires `acceptTerms: true` and stores when and
