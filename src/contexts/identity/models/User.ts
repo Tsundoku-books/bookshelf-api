@@ -41,6 +41,12 @@ export class User {
   @Column({ type: 'varchar', length: 255, select: false })
   password!: string;
 
+  @Column({ name: 'terms_accepted_at', type: 'timestamp', nullable: true })
+  termsAcceptedAt!: Date | null;
+
+  @Column({ name: 'terms_version', type: 'varchar', length: 20, nullable: true })
+  termsVersion!: string | null;
+
   @OneToMany('Book', 'user')
   books!: unknown[];
 

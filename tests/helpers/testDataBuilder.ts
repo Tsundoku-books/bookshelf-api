@@ -20,6 +20,7 @@ export class TestDataBuilder {
       name: 'Test User',
       email: this.generateUniqueEmail(),
       password: 'secret123',
+      acceptTerms: true,
       ...overrides,
     };
   }

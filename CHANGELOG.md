@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Terms acceptance:** `POST /api/auth/register` now requires `acceptTerms: true` and stores when and
+  which version of the Terms of Service and Privacy Policy was accepted (`users.terms_accepted_at`,
+  `users.terms_version`; NULL for accounts created before). **Breaking:** requests without it get 400.
 - **Accounts with roles** (`reader`, `buyer`, `seller`, `admin`): register with an optional
   `roles` list, `GET /api/me`, `PATCH /api/me/roles`. The library (`/books`, `/stats`) now
   needs the `reader` role; existing accounts default to it. Admins come from `ADMIN_EMAILS`.

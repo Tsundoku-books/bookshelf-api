@@ -17,6 +17,9 @@ export const registerSchema = z.object({
     .array(z.enum(SELF_SERVICE_ROLES), { invalid_type_error: 'Roles must be a list' })
     .min(1, 'Choose at least one role')
     .optional(),
+  acceptTerms: z.literal(true, {
+    errorMap: () => ({ message: 'You must accept the Terms of Service and Privacy Policy' }),
+  }),
 });
 
 export const loginSchema = z.object({

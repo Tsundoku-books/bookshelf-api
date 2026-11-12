@@ -80,6 +80,13 @@ describe('POST /api/auth/register', () => {
       expect(response.body.error).toMatch(/password|at least|6/i);
     });
 
+    it.each([[false], [undefined]])('returns 400 when acceptTerms is %p', async acceptTerms => {
+      const response = await apiClient.register(TestDataBuilder.createUser({ acceptTerms }));
+
+      expect(response.status).toBe(400);
+      expect(response.body.error).toMatch(/accept the terms/i);
+    });
+
     it('returns 400 when the body is empty', async () => {
       const response = await apiClient.register({});
 

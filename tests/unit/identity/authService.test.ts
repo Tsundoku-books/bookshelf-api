@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { AuthService, withAdminIfAllowlisted } from '../../../src/contexts/identity/auth/authService';
 import { verifyAuthToken } from '../../../src/shared/jwt';
 import { Role } from '../../../src/shared/roles';
+import { TERMS_VERSION } from '../../../src/shared/terms';
 
 const repository = {
   findOne: jest.fn(),
@@ -26,6 +27,7 @@ describe('AuthService.register', () => {
       name: 'Ana',
       email: 'ana@test.com',
       password: 'secret1',
+      acceptTerms: true,
     });
 
     expect(user.roles).toEqual([Role.READER]);
@@ -36,6 +38,16 @@ describe('AuthService.register', () => {
     expect(verifyAuthToken(token)).toEqual({ userId: 'u1', roles: [Role.READER] });
   });
 
+  it('records when and which version of the terms was accepted', async () => {
+    repository.findOne.mockResolvedValue(null);
+
+    await AuthService.register({ name: 'Ana', email: 'ana@test.com', password: 'secret1', acceptTerms: true });
+
+    const saved = repository.save.mock.calls[0][0] as { termsAcceptedAt: Date; termsVersion: string };
+    expect(saved.termsAcceptedAt).toBeInstanceOf(Date);
+    expect(saved.termsVersion).toBe(TERMS_VERSION);
+  });
+
   it('stores the requested roles and makes sellers buyers too', async () => {
     repository.findOne.mockResolvedValue(null);
 
@@ -44,6 +56,7 @@ describe('AuthService.register', () => {
       email: 'bia@test.com',
       password: 'secret1',
       roles: [Role.SELLER],
+      acceptTerms: true,
     });
 
     expect([...user.roles].sort()).toEqual([Role.BUYER, Role.SELLER].sort());
@@ -56,6 +69,7 @@ describe('AuthService.register', () => {
       name: 'Root',
       email: 'ADMIN@bookshelf.test',
       password: 'secret1',
+      acceptTerms: true,
     });
 
     expect(user.roles).toContain(Role.ADMIN);
@@ -65,7 +79,7 @@ describe('AuthService.register', () => {
     repository.findOne.mockResolvedValue({ id: 'existing' });
 
     await expect(
-      AuthService.register({ name: 'A', email: 'a@test.com', password: 'secret1' }),
+      AuthService.register({ name: 'A', email: 'a@test.com', password: 'secret1', acceptTerms: true }),
     ).rejects.toMatchObject({ code: 'EMAIL_ALREADY_REGISTERED', statusCode: 409 });
     expect(repository.save).not.toHaveBeenCalled();
   });

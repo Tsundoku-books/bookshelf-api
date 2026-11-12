@@ -4,6 +4,7 @@ import { env } from '../../../config/env';
 import { ConflictError, ForbiddenError, UnauthorizedError } from '../../../shared/errors';
 import { signAuthToken } from '../../../shared/jwt';
 import { DEFAULT_ROLES, normalizeRoles, Role } from '../../../shared/roles';
+import { TERMS_VERSION } from '../../../shared/terms';
 import { User, UserStatus } from '../models/User';
 import { LoginInput, RegisterInput } from './authSchemas';
 
@@ -41,6 +42,8 @@ export class AuthService {
         email,
         password: await bcrypt.hash(password, BCRYPT_ROUNDS),
         roles: withAdminIfAllowlisted(email, normalizeRoles(roles ?? DEFAULT_ROLES)),
+        termsAcceptedAt: new Date(),
+        termsVersion: TERMS_VERSION,
       }),
     );
 

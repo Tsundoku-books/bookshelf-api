@@ -24,12 +24,12 @@ const company = {
 };
 
 describe('registerSchema', () => {
-  const base = { name: '  Ana ', email: ' ANA@Test.com ', password: 'secret1' };
+  const base = { name: '  Ana ', email: ' ANA@Test.com ', password: 'secret1', acceptTerms: true };
 
   it('trims and lower-cases, and leaves roles undefined when omitted', () => {
     const parsed = registerSchema.parse(base);
 
-    expect(parsed).toEqual({ name: 'Ana', email: 'ana@test.com', password: 'secret1' });
+    expect(parsed).toEqual({ name: 'Ana', email: 'ana@test.com', password: 'secret1', acceptTerms: true });
   });
 
   it('accepts the self-service roles', () => {
@@ -40,11 +40,18 @@ describe('registerSchema', () => {
     expect(registerSchema.safeParse({ ...base, roles }).success).toBe(false);
   });
 
+  it.each([[false], ['true'], [undefined]])('rejects acceptTerms %p', acceptTerms => {
+    const result = registerSchema.safeParse({ ...base, acceptTerms });
+
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error.issues.map(i => i.message).join()).toContain('accept the Terms');
+  });
+
   it.each([
     [{ ...base, password: '123' }, 'at least 6'],
     [{ ...base, email: 'nope' }, 'Invalid email'],
     [{ ...base, name: '  ' }, 'Name is required'],
-    [{ email: 'a@b.co', password: 'secret1' }, 'Name is required'],
+    [{ email: 'a@b.co', password: 'secret1', acceptTerms: true }, 'Name is required'],
   ])('rejects invalid input %#', (input, message) => {
     const result = registerSchema.safeParse(input);
 

@@ -43,11 +43,16 @@ const swaggerOptions: swaggerJSDoc.Options = {
       schemas: {
         RegisterInput: {
           type: 'object',
-          required: ['name', 'email', 'password'],
+          required: ['name', 'email', 'password', 'acceptTerms'],
           properties: {
             name: { type: 'string', example: 'Jane Doe' },
             email: { type: 'string', format: 'email', example: 'jane@example.com' },
             password: { type: 'string', format: 'password', minLength: 6, example: 'secret123' },
+            acceptTerms: {
+              type: 'boolean',
+              enum: [true],
+              description: 'Must be true: acceptance of the Terms of Service and Privacy Policy.',
+            },
             roles: {
               type: 'array',
               description: 'What the account will be used for. Defaults to [reader].',
