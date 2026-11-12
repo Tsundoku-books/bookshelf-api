@@ -115,6 +115,24 @@ describe('env', () => {
     ).toBe(true);
   });
 
+  it('keeps the API docs on unless turned off', () => {
+    expect(loadEnv().env.apiDocsEnabled).toBe(true);
+    expect(loadEnv({ API_DOCS_ENABLED: 'false' }).env.apiDocsEnabled).toBe(false);
+  });
+
+  it('warns that the database certificate is unverified in production without a CA', () => {
+    const hosted = { NODE_ENV: 'production', DATABASE_URL: 'postgresql://u:p@host:5432/db' };
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    loadEnv(hosted);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('DATABASE_CA_CERT'));
+
+    warn.mockClear();
+    loadEnv({ ...hosted, DATABASE_CA_CERT: 'pem' });
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
   it('refuses a short JWT secret in production only', () => {
     expect(() => loadEnv({ NODE_ENV: 'production', JWT_SECRET: 'short' })).toThrow('process.exit');
     expect(error.mock.calls.map(call => String(call[0])).join('\n')).toContain('JWT_SECRET');

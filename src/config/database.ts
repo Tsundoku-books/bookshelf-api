@@ -1,6 +1,7 @@
 import path from 'path';
 import { DataSource } from 'typeorm';
 import { env } from './env';
+import { databaseSsl } from './ssl';
 import { User } from '../contexts/identity/models/User';
 import { Book } from '../contexts/library/models/Book';
 import { Company } from '../contexts/identity/models/Company';
@@ -15,7 +16,7 @@ import { PaymentCharge } from '../contexts/payments/models/PaymentCharge';
 
 // Hosted providers (Supabase/Render) give a single DATABASE_URL and require SSL.
 const connection = env.DATABASE_URL
-  ? { url: env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
+  ? { url: env.DATABASE_URL, ssl: databaseSsl(env.DATABASE_CA_CERT) }
   : {
       host: env.DB_HOST,
       port: env.DB_PORT ?? 5432,

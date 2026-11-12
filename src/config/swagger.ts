@@ -107,6 +107,8 @@ const swaggerOptions: swaggerJSDoc.Options = {
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
 export function setupSwagger(app: Express): void {
+  if (!env.apiDocsEnabled) return;
+
   // The global helmet() CSP blocks Swagger UI's inline scripts; relax just this route.
   const swaggerCsp = helmet({
     contentSecurityPolicy: {

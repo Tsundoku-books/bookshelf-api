@@ -32,6 +32,10 @@ const envSchema = z
     ADMIN_EMAILS: z.string().optional(),
     // The only payment gateway is a simulator; production must opt in explicitly (demo deployments only).
     ALLOW_SIMULATED_PAYMENTS: z.enum(['true', 'false']).default('false'),
+    // Swagger UI is part of the public demo, so it stays on unless explicitly turned off.
+    API_DOCS_ENABLED: z.enum(['true', 'false']).default('true'),
+    // PEM of the CA that signs the database certificate; enables full verification of the connection.
+    DATABASE_CA_CERT: z.string().optional(),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   })
   .transform(raw => ({
@@ -40,6 +44,7 @@ const envSchema = z
       .split(',')
       .map(email => email.trim().toLowerCase())
       .filter(Boolean),
+    apiDocsEnabled: raw.API_DOCS_ENABLED === 'true',
     simulatedPaymentsEnabled: raw.NODE_ENV !== 'production' || raw.ALLOW_SIMULATED_PAYMENTS === 'true',
     corsOrigins: raw.CORS_ORIGIN
       ? raw.CORS_ORIGIN.split(',').map(origin => origin.trim())
@@ -74,6 +79,10 @@ function loadEnv() {
     console.error('Invalid environment configuration:');
     console.error(`  - JWT_SECRET: must be at least ${MIN_PRODUCTION_SECRET_LENGTH} characters in production`);
     process.exit(1);
+  }
+
+  if (parsed.data.NODE_ENV === 'production' && parsed.data.DATABASE_URL && !parsed.data.DATABASE_CA_CERT) {
+    console.warn('WARNING: DATABASE_CA_CERT is not set, so the database server certificate is not verified');
   }
 
   return parsed.data;

@@ -10,7 +10,7 @@ async function startServer(): Promise<void> {
 
   app.listen(env.PORT, () => {
     log.info({ port: env.PORT, env: env.NODE_ENV }, 'BookShelf API running');
-    log.info(`Docs: http://localhost:${env.PORT}/api-docs`);
+    if (env.apiDocsEnabled) log.info(`Docs: http://localhost:${env.PORT}/api-docs`);
   });
 }
 
