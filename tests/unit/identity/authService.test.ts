@@ -132,6 +132,18 @@ describe('AuthService.login', () => {
     });
   });
 
+  it('still hashes the password for an unknown email, so timing does not reveal it', async () => {
+    repository.findOne.mockResolvedValue(null);
+    const compare = jest.spyOn(bcrypt, 'compare');
+
+    await expect(AuthService.login({ email: 'nobody@test.com', password: 'secret1' })).rejects.toMatchObject({
+      code: 'INVALID_CREDENTIALS',
+    });
+
+    expect(compare).toHaveBeenCalledTimes(1);
+    compare.mockRestore();
+  });
+
   it('refuses a suspended account only after the credentials check out', async () => {
     repository.findOne.mockResolvedValue(await stored({ status: 'suspended' }));
 

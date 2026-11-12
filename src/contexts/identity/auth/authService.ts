@@ -10,6 +10,10 @@ import { LoginInput, RegisterInput } from './authSchemas';
 
 const BCRYPT_ROUNDS = 10;
 
+// Compared against when the email is unknown, so a miss costs as much as a wrong password
+// and response time does not reveal which emails have an account.
+const UNKNOWN_USER_HASH = bcrypt.hashSync('unknown-user', BCRYPT_ROUNDS);
+
 export interface PublicUser {
   id: string;
   name: string;
@@ -61,7 +65,7 @@ export class AuthService {
 
     // Same error for unknown email and wrong password so the endpoint does not
     // reveal which accounts exist.
-    const passwordMatches = user ? await bcrypt.compare(password, user.password) : false;
+    const passwordMatches = await bcrypt.compare(password, user?.password ?? UNKNOWN_USER_HASH);
     if (!user || !passwordMatches) {
       throw new UnauthorizedError('Invalid credentials', 'INVALID_CREDENTIALS');
     }
