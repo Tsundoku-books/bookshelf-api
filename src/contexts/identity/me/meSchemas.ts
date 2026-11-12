@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { SELF_SERVICE_ROLES } from '../../../shared/roles';
+import { newPasswordSchema } from '../../../shared/password';
 
 const selfServiceRoles = z.array(z.enum(SELF_SERVICE_ROLES)).default([]);
 
@@ -11,9 +12,7 @@ export const updateProfileSchema = z.object({
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string({ required_error: 'Current password is required' }).min(1, 'Current password is required'),
-  newPassword: z
-    .string({ required_error: 'New password is required' })
-    .min(6, 'Password must be at least 6 characters long'),
+  newPassword: newPasswordSchema,
 });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;

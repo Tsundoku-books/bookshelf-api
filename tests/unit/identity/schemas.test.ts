@@ -24,12 +24,12 @@ const company = {
 };
 
 describe('registerSchema', () => {
-  const base = { name: '  Ana ', email: ' ANA@Test.com ', password: 'secret1', acceptTerms: true };
+  const base = { name: '  Ana ', email: ' ANA@Test.com ', password: 'secret12', acceptTerms: true };
 
   it('trims and lower-cases, and leaves roles undefined when omitted', () => {
     const parsed = registerSchema.parse(base);
 
-    expect(parsed).toEqual({ name: 'Ana', email: 'ana@test.com', password: 'secret1', acceptTerms: true });
+    expect(parsed).toEqual({ name: 'Ana', email: 'ana@test.com', password: 'secret12', acceptTerms: true });
   });
 
   it('accepts the self-service roles', () => {
@@ -48,10 +48,12 @@ describe('registerSchema', () => {
   });
 
   it.each([
-    [{ ...base, password: '123' }, 'at least 6'],
+    [{ ...base, password: '1234567' }, 'at least 8'],
+    [{ ...base, password: 'a'.repeat(73) }, 'at most 72 bytes'],
+    [{ ...base, password: 'é'.repeat(37) }, 'at most 72 bytes'],
     [{ ...base, email: 'nope' }, 'Invalid email'],
     [{ ...base, name: '  ' }, 'Name is required'],
-    [{ email: 'a@b.co', password: 'secret1', acceptTerms: true }, 'Name is required'],
+    [{ email: 'a@b.co', password: 'secret12', acceptTerms: true }, 'Name is required'],
   ])('rejects invalid input %#', (input, message) => {
     const result = registerSchema.safeParse(input);
 
