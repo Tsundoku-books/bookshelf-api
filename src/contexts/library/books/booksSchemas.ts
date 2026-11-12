@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { BookStatus } from '../types';
+import { coverUrlSchema } from '../../../shared/coverUrl';
 
 /** Columns clients may sort by (whitelist guards against SQL injection). */
 export const SORTABLE_COLUMNS = [
@@ -61,7 +62,7 @@ export const createBookSchema = z.object({
   description: optionalText,
   rating: rating.transform(nullToUndefined),
   notes: optionalText,
-  coverUrl: optionalText,
+  coverUrl: optionalText.pipe(coverUrlSchema.optional()),
 });
 
 export const updateBookSchema = z.object({
@@ -77,7 +78,7 @@ export const updateBookSchema = z.object({
   description: clearableText,
   rating,
   notes: clearableText,
-  coverUrl: clearableText,
+  coverUrl: coverUrlSchema.nullish(),
 });
 
 export const updateBookStatusSchema = z.object({

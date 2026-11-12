@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { CatalogBookStatus, CatalogReviewStatus } from './models/CatalogBook';
 import { RevisionStatus } from './models/CatalogRevision';
+import { coverUrlSchema } from '../../shared/coverUrl';
 
 const page = z.coerce.number().int().positive().default(1);
 const limit = z.coerce.number().int().positive().max(100).default(20);
@@ -42,7 +43,7 @@ export const adminEditSchema = z
     pages: z.number().int().positive().nullish(),
     language: nullableText(10),
     description: z.string().nullish(),
-    coverUrl: nullableText(500),
+    coverUrl: coverUrlSchema.nullish(),
   })
   .strict();
 
