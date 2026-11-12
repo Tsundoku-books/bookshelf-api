@@ -32,7 +32,10 @@ export class AuthService {
 
   static async register({ name, email, password, roles }: RegisterInput): Promise<AuthResult> {
     const existing = await this.repository.findOne({ where: { email }, select: ['id'] });
-    if (existing) {
+    // Emails are not verified, so anyone could claim an admin address that has no account yet.
+    // Same error as a taken email so the allow-list is not revealed.
+    const reserved = env.NODE_ENV === 'production' && env.adminEmails.includes(email);
+    if (existing || reserved) {
       throw new ConflictError('Email is already registered', 'EMAIL_ALREADY_REGISTERED');
     }
 

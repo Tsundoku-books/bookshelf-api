@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { AuthService, withAdminIfAllowlisted } from '../../../src/contexts/identity/auth/authService';
+import { env } from '../../../src/config/env';
 import { verifyAuthToken } from '../../../src/shared/jwt';
 import { Role } from '../../../src/shared/roles';
 import { TERMS_VERSION } from '../../../src/shared/terms';
@@ -73,6 +74,18 @@ describe('AuthService.register', () => {
     });
 
     expect(user.roles).toContain(Role.ADMIN);
+  });
+
+  it('does not let anyone register an admin allow-listed email in production', async () => {
+    repository.findOne.mockResolvedValue(null);
+    const nodeEnv = jest.replaceProperty(env, 'NODE_ENV', 'production');
+
+    await expect(
+      AuthService.register({ name: 'Eve', email: 'admin@bookshelf.test', password: 'secret12', acceptTerms: true }),
+    ).rejects.toMatchObject({ code: 'EMAIL_ALREADY_REGISTERED', statusCode: 409 });
+    expect(repository.save).not.toHaveBeenCalled();
+
+    nodeEnv.restore();
   });
 
   it('rejects an email that is already registered', async () => {
