@@ -3,6 +3,8 @@ import { z } from 'zod';
 
 dotenv.config();
 
+const MIN_PRODUCTION_SECRET_LENGTH = 32;
+
 const DEFAULT_CORS_ORIGINS = [
   'http://localhost:3000',
   'http://localhost:5173',
@@ -68,8 +70,10 @@ function loadEnv() {
     process.exit(1);
   }
 
-  if (parsed.data.NODE_ENV === 'production' && parsed.data.JWT_SECRET.length < 32) {
-    console.warn('WARNING: JWT_SECRET should be at least 32 characters long in production');
+  if (parsed.data.NODE_ENV === 'production' && parsed.data.JWT_SECRET.length < MIN_PRODUCTION_SECRET_LENGTH) {
+    console.error('Invalid environment configuration:');
+    console.error(`  - JWT_SECRET: must be at least ${MIN_PRODUCTION_SECRET_LENGTH} characters in production`);
+    process.exit(1);
   }
 
   return parsed.data;

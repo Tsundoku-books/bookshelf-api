@@ -31,6 +31,7 @@ describe('jwt', () => {
     ['garbage', 'not-a-token'],
     ['signed with another secret', jwt.sign({ userId: 'u' }, 'another-secret')],
     ['without a user id', jwt.sign({ roles: ['reader'] }, env.JWT_SECRET)],
+    ['signed with another algorithm', jwt.sign({ userId: 'u' }, env.JWT_SECRET, { algorithm: 'HS512' })],
     ['expired', jwt.sign({ userId: 'u' }, env.JWT_SECRET, { expiresIn: -10 })],
   ])('rejects a token that is %s', (_label, token) => {
     expect(() => verifyAuthToken(token)).toThrow(UnauthorizedError);

@@ -34,14 +34,12 @@ function loadEnv(overrides: Record<string, string | undefined> = {}, base: Recor
 describe('env', () => {
   let exit: jest.SpyInstance;
   let error: jest.SpyInstance;
-  let warn: jest.SpyInstance;
 
   beforeEach(() => {
     exit = jest.spyOn(process, 'exit').mockImplementation((() => {
       throw new Error('process.exit');
     }) as never);
     error = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -117,12 +115,10 @@ describe('env', () => {
     ).toBe(true);
   });
 
-  it('warns about a short JWT secret in production only', () => {
-    loadEnv({ NODE_ENV: 'production', JWT_SECRET: 'short' });
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('JWT_SECRET'));
+  it('refuses a short JWT secret in production only', () => {
+    expect(() => loadEnv({ NODE_ENV: 'production', JWT_SECRET: 'short' })).toThrow('process.exit');
+    expect(error.mock.calls.map(call => String(call[0])).join('\n')).toContain('JWT_SECRET');
 
-    warn.mockClear();
-    loadEnv({ NODE_ENV: 'test', JWT_SECRET: 'short' });
-    expect(warn).not.toHaveBeenCalled();
+    expect(() => loadEnv({ NODE_ENV: 'test', JWT_SECRET: 'short' })).not.toThrow();
   });
 });

@@ -3,6 +3,8 @@ import { env } from '../config/env';
 import { UnauthorizedError } from './errors';
 import { DEFAULT_ROLES, Role } from './roles';
 
+const JWT_ALGORITHM = 'HS256';
+
 export interface TokenPayload {
   userId: string;
   roles: Role[];
@@ -10,6 +12,7 @@ export interface TokenPayload {
 
 export function signAuthToken(userId: string, roles: Role[] = DEFAULT_ROLES): string {
   return jwt.sign({ userId, roles }, env.JWT_SECRET, {
+    algorithm: JWT_ALGORITHM,
     expiresIn: env.JWT_EXPIRES_IN,
   } as jwt.SignOptions);
 }
@@ -18,7 +21,7 @@ const KNOWN_ROLES = new Set<string>(Object.values(Role));
 
 export function verifyAuthToken(token: string): TokenPayload {
   try {
-    const decoded = jwt.verify(token, env.JWT_SECRET);
+    const decoded = jwt.verify(token, env.JWT_SECRET, { algorithms: [JWT_ALGORITHM] });
     if (typeof decoded === 'string' || typeof decoded.userId !== 'string') {
       throw new UnauthorizedError('Invalid token', 'INVALID_TOKEN');
     }
