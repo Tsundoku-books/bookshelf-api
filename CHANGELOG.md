@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- Cover URLs must be hosted on a known image host (`COVER_HOSTS` in `src/shared/coverUrl.ts`: Google Books,
+  Open Library, Wikimedia, Amazon and a few placeholder services), so an arbitrary server cannot learn who opens a
+  book. Covers already stored are untouched; editing one with a link on another host is rejected.
 - **Sessions follow the account:** the auth middleware reads status and roles from the database on every
   request, so suspending, deleting or demoting an account takes effect at once instead of when its token expires.
 - Emails in `ADMIN_EMAILS` cannot be registered in production (emails are not verified), so nobody can claim

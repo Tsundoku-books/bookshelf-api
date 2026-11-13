@@ -191,18 +191,26 @@ describe('Books - additional validations', () => {
   describe('URL', () => {
     it('accepts a valid cover URL', async () => {
       const bookData = TestDataBuilder.createBook({
-        coverUrl: 'https://example.com/covers/book-cover.jpg',
+        coverUrl: 'https://covers.openlibrary.org/b/id/1-L.jpg',
       });
 
       const response = await apiClient.createBook(bookData);
 
       expect(response.status).toBe(201);
-      expect(response.body.book.coverUrl).toBe('https://example.com/covers/book-cover.jpg');
+      expect(response.body.book.coverUrl).toBe('https://covers.openlibrary.org/b/id/1-L.jpg');
+    });
+
+    it('rejects a cover hosted outside the allowed image hosts', async () => {
+      const response = await apiClient.createBook(
+        TestDataBuilder.createBook({ coverUrl: 'https://evil.example/c.jpg' }),
+      );
+
+      expect(response.status).toBe(400);
     });
 
     it('accepts a URL with query parameters', async () => {
       const bookData = TestDataBuilder.createBook({
-        coverUrl: 'https://cdn.example.com/image?id=123&size=large&format=jpg',
+        coverUrl: 'https://picsum.photos/image?id=123&size=large&format=jpg',
       });
 
       const response = await apiClient.createBook(bookData);
