@@ -164,7 +164,7 @@ describe('validate', () => {
     });
     const next = jest.fn();
 
-    validate({ body: schema as unknown as z.AnyZodObject })(mockReq({ body: {} }), mockRes(), next);
+    validate({ body: schema as unknown as z.ZodType })(mockReq({ body: {} }), mockRes(), next);
 
     expect(next).toHaveBeenCalledWith(boom);
   });
