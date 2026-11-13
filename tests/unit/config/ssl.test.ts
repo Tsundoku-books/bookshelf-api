@@ -5,8 +5,14 @@ describe('databaseSsl', () => {
     expect(databaseSsl()).toEqual({ rejectUnauthorized: false });
   });
 
+  it('keeps a PEM that already has real newlines', () => {
+    const pem = '-----BEGIN CERTIFICATE-----\nABC\n-----END CERTIFICATE-----';
+
+    expect(databaseSsl(pem).ca).toBe(pem);
+  });
+
   it('verifies the server against the configured CA, restoring escaped newlines', () => {
-    expect(databaseSsl('-----BEGIN CERTIFICATE-----\nABC\n-----END CERTIFICATE-----')).toEqual({
+    expect(databaseSsl('-----BEGIN CERTIFICATE-----\\nABC\\n-----END CERTIFICATE-----')).toEqual({
       ca: '-----BEGIN CERTIFICATE-----\nABC\n-----END CERTIFICATE-----',
       rejectUnauthorized: true,
     });

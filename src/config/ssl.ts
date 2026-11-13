@@ -11,5 +11,5 @@ export interface DatabaseSsl {
 export function databaseSsl(caCert?: string): DatabaseSsl {
   if (!caCert) return { rejectUnauthorized: false };
   // Env var managers often store a PEM on one line with literal \n sequences.
-  return { ca: caCert.replace(/\n/g, '\n'), rejectUnauthorized: true };
+  return { ca: caCert.replace(/\\n/g, '\n'), rejectUnauthorized: true };
 }
