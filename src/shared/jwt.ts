@@ -8,10 +8,11 @@ const JWT_ALGORITHM = 'HS256';
 export interface TokenPayload {
   userId: string;
   roles: Role[];
+  tokenVersion: number;
 }
 
-export function signAuthToken(userId: string, roles: Role[] = DEFAULT_ROLES): string {
-  return jwt.sign({ userId, roles }, env.JWT_SECRET, {
+export function signAuthToken(userId: string, roles: Role[] = DEFAULT_ROLES, tokenVersion = 0): string {
+  return jwt.sign({ userId, roles, tv: tokenVersion }, env.JWT_SECRET, {
     algorithm: JWT_ALGORITHM,
     expiresIn: env.JWT_EXPIRES_IN,
   } as jwt.SignOptions);
@@ -28,7 +29,7 @@ export function verifyAuthToken(token: string): TokenPayload {
     // Tokens issued before roles existed carry none; those accounts were library-only.
     const claimed: unknown[] = Array.isArray(decoded.roles) ? decoded.roles : DEFAULT_ROLES;
     const roles = claimed.filter((role): role is Role => KNOWN_ROLES.has(String(role)));
-    return { userId: decoded.userId, roles };
+    return { userId: decoded.userId, roles, tokenVersion: typeof decoded.tv === 'number' ? decoded.tv : 0 };
   } catch {
     throw new UnauthorizedError('Invalid token', 'INVALID_TOKEN');
   }

@@ -64,7 +64,7 @@ router.patch(
  *     tags: [Me]
  *     security: [{ bearerAuth: [] }]
  *     responses:
- *       200: { description: Password changed }
+ *       200: { description: Password changed; the response carries a fresh token and the other sessions end }
  *       400: { description: Invalid input, or the current password is incorrect }
  */
 router.patch(
@@ -72,8 +72,8 @@ router.patch(
   passwordChangeLimiter,
   validate({ body: changePasswordSchema }),
   asyncHandler(async (req: Request, res: Response) => {
-    await MeService.changePassword(userId(req), req.body);
-    res.json({ message: 'Password changed' });
+    const result = await MeService.changePassword(userId(req), req.body);
+    res.json({ message: 'Password changed', ...result });
   }),
 );
 

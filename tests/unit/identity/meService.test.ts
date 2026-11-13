@@ -107,9 +107,11 @@ describe('MeService.changePassword', () => {
   it('stores a hash of the new password', async () => {
     users.findOne.mockResolvedValue(await stored());
 
-    await MeService.changePassword('u1', { currentPassword: 'old-secret', newPassword: 'new-secret' });
+    const result = await MeService.changePassword('u1', { currentPassword: 'old-secret', newPassword: 'new-secret' });
 
     const [, change] = users.update.mock.calls[0];
+    expect(typeof change.tokenVersion).toBe('function');
+    expect(result.token).toBeTruthy();
     expect(change.password).not.toBe('new-secret');
     await expect(bcrypt.compare('new-secret', change.password)).resolves.toBe(true);
   });

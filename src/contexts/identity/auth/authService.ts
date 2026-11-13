@@ -60,7 +60,7 @@ export class AuthService {
   static async login({ email, password }: LoginInput): Promise<AuthResult> {
     const user = await this.repository.findOne({
       where: { email },
-      select: ['id', 'name', 'email', 'password', 'roles', 'status', 'createdAt', 'updatedAt'],
+      select: ['id', 'name', 'email', 'password', 'roles', 'status', 'tokenVersion', 'createdAt', 'updatedAt'],
     });
 
     // Same error for unknown email and wrong password so the endpoint does not
@@ -106,5 +106,5 @@ export function toPublicUser(user: User): PublicUser {
 }
 
 export function issue(user: User): AuthResult {
-  return { token: signAuthToken(user.id, user.roles), user: toPublicUser(user) };
+  return { token: signAuthToken(user.id, user.roles, user.tokenVersion), user: toPublicUser(user) };
 }

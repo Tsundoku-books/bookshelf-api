@@ -36,7 +36,7 @@ describe('AuthService.register', () => {
     const saved = repository.save.mock.calls[0][0] as { password: string };
     expect(saved.password).not.toBe('secret1');
     await expect(bcrypt.compare('secret1', saved.password)).resolves.toBe(true);
-    expect(verifyAuthToken(token)).toEqual({ userId: 'u1', roles: [Role.READER] });
+    expect(verifyAuthToken(token)).toEqual({ userId: 'u1', roles: [Role.READER], tokenVersion: 0 });
   });
 
   it('records when and which version of the terms was accepted', async () => {

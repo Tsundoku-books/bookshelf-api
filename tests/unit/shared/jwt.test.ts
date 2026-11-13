@@ -8,7 +8,15 @@ describe('jwt', () => {
   it('round-trips the user id and roles', () => {
     const token = signAuthToken('user-1', [Role.READER, Role.SELLER]);
 
-    expect(verifyAuthToken(token)).toEqual({ userId: 'user-1', roles: [Role.READER, Role.SELLER] });
+    expect(verifyAuthToken(token)).toEqual({
+      userId: 'user-1',
+      roles: [Role.READER, Role.SELLER],
+      tokenVersion: 0,
+    });
+  });
+
+  it('carries the token version', () => {
+    expect(verifyAuthToken(signAuthToken('user-1', [Role.READER], 3)).tokenVersion).toBe(3);
   });
 
   it('defaults to the reader role when signing without roles', () => {
@@ -18,7 +26,7 @@ describe('jwt', () => {
   it('treats tokens issued before roles existed as library-only', () => {
     const legacy = jwt.sign({ userId: 'old-user' }, env.JWT_SECRET);
 
-    expect(verifyAuthToken(legacy)).toEqual({ userId: 'old-user', roles: [Role.READER] });
+    expect(verifyAuthToken(legacy)).toEqual({ userId: 'old-user', roles: [Role.READER], tokenVersion: 0 });
   });
 
   it('drops role claims it does not know', () => {

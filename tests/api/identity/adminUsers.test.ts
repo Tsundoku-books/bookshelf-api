@@ -258,6 +258,24 @@ describe('admin: users', () => {
       expect((await new ApiClient().login({ email, password: 'brand-new-1' })).status).toBe(200);
     });
 
+    it('ends the other sessions when the password changes, and keeps the current one on a fresh token', async () => {
+      const { api, email, password } = await signUp();
+      const elsewhere = new ApiClient();
+      elsewhere.setToken((await new ApiClient().login({ email, password })).body.token);
+      expect((await elsewhere.call('get', '/me')).status).toBe(200);
+
+      const changed = await api.call('patch', '/me/password', { currentPassword: password, newPassword: 'brand-new-1' });
+      expect(changed.status).toBe(200);
+      expect(changed.body.token).toBeTruthy();
+
+      const oldSession = await elsewhere.call('get', '/me');
+      expect(oldSession.status).toBe(401);
+      expect(oldSession.body.code).toBe('INVALID_TOKEN');
+      expect((await api.call('get', '/me')).status).toBe(401);
+      api.setToken(changed.body.token);
+      expect((await api.call('get', '/me')).status).toBe(200);
+    });
+
     it('rejects a short new password', async () => {
       const { api, password } = await signUp();
 

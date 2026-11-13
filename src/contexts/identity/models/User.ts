@@ -41,6 +41,10 @@ export class User {
   @Column({ type: 'varchar', length: 255, select: false })
   password!: string;
 
+  /** Part of every token; bumped when the password changes so the other sessions end. */
+  @Column({ name: 'token_version', type: 'int', default: 0 })
+  tokenVersion!: number;
+
   @Column({ name: 'terms_accepted_at', type: 'timestamp', nullable: true })
   termsAcceptedAt!: Date | null;
 

@@ -30,7 +30,10 @@ export class MeService {
   }
 
   /** Asks for the current password so a stolen session cannot lock the owner out. */
-  static async changePassword(userId: string, { currentPassword, newPassword }: ChangePasswordInput): Promise<void> {
+  static async changePassword(
+    userId: string,
+    { currentPassword, newPassword }: ChangePasswordInput,
+  ): Promise<AuthResult> {
     const user = await this.users.findOne({ where: { id: userId }, select: ['id', 'password'] });
     if (!user) {
       throw new NotFoundError('User not found', 'USER_NOT_FOUND');
@@ -42,7 +45,9 @@ export class MeService {
     if (currentPassword === newPassword) {
       throw new BadRequestError('The new password must be different', 'PASSWORD_UNCHANGED');
     }
-    await this.users.update(userId, { password: await bcrypt.hash(newPassword, 10) });
+    await this.users.update(userId, { password: await bcrypt.hash(newPassword, 10), tokenVersion: () => '"token_version" + 1' });
+    // Every other session ends with the change; this one continues on the fresh token.
+    return issue(await this.requireUser(userId));
   }
 
   /**

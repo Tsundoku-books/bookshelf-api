@@ -22,9 +22,13 @@ export const authMiddleware = async (req: Request, _res: Response, next: NextFun
       throw new UnauthorizedError('Malformed authentication token', 'TOKEN_MALFORMED');
     }
 
-    const { userId } = verifyAuthToken(token);
+    const { userId, tokenVersion } = verifyAuthToken(token);
     const account = await IdentityDirectory.accountState(userId);
     if (!account) {
+      throw new UnauthorizedError('Invalid token', 'INVALID_TOKEN');
+    }
+    // A password change bumps the version, which ends every session issued before it.
+    if (account.tokenVersion !== tokenVersion) {
       throw new UnauthorizedError('Invalid token', 'INVALID_TOKEN');
     }
     if (account.status === UserStatus.SUSPENDED) {

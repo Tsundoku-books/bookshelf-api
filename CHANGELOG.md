@@ -28,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is unset. New `API_DOCS_ENABLED=false` hides Swagger UI (on by default, as the README advertises it).
 - The payment webhook signature now covers the exact bytes received instead of a re-serialised copy of the
   parsed JSON, and `PAYMENTS_WEBHOOK_SECRET` can replace the key derived from `JWT_SECRET`.
+- **Changing the password ends the other sessions:** `PATCH /api/me/password` now answers with a fresh `token`
+  and `user` (the caller must switch to it); tokens issued before the change get 401 `INVALID_TOKEN`
+  (`users.token_version`).
 - Dependencies updated with `npm audit fix` (including `proxy-addr`, `body-parser`, `brace-expansion`).
 
 ### Added

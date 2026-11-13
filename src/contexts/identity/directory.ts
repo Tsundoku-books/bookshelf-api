@@ -12,8 +12,11 @@ export class IdentityDirectory {
   }
 
   /** What the auth middleware needs on every request; null when the account no longer exists. */
-  static async accountState(id: string): Promise<Pick<User, 'id' | 'roles' | 'status'> | null> {
-    return AppDataSource.getRepository(User).findOne({ where: { id }, select: { id: true, roles: true, status: true } });
+  static async accountState(id: string): Promise<Pick<User, 'id' | 'roles' | 'status' | 'tokenVersion'> | null> {
+    return AppDataSource.getRepository(User).findOne({
+      where: { id },
+      select: { id: true, roles: true, status: true, tokenVersion: true },
+    });
   }
 
   static async companyNames(ids: string[]): Promise<Map<string, string>> {
