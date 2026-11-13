@@ -1,17 +1,18 @@
 import { z } from 'zod';
 import { SELF_SERVICE_ROLES } from '../../../shared/roles';
 import { newPasswordSchema } from '../../../shared/password';
+import { required } from '../../../shared/zodMessages';
 
 const selfServiceRoles = z.array(z.enum(SELF_SERVICE_ROLES)).default([]);
 
 export const updateRolesSchema = z.object({ add: selfServiceRoles, remove: selfServiceRoles });
 
 export const updateProfileSchema = z.object({
-  name: z.string({ required_error: 'Name is required' }).trim().min(1, 'Name is required').max(255),
+  name: z.string(required('Name is required')).trim().min(1, 'Name is required').max(255),
 });
 
 export const changePasswordSchema = z.object({
-  currentPassword: z.string({ required_error: 'Current password is required' }).min(1, 'Current password is required'),
+  currentPassword: z.string(required('Current password is required')).min(1, 'Current password is required'),
   newPassword: newPasswordSchema,
 });
 

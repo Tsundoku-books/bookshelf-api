@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { BookStatus } from '../types';
 import { coverUrlSchema } from '../../../shared/coverUrl';
+import { required } from '../../../shared/zodMessages';
 
 /** Columns clients may sort by (whitelist guards against SQL injection). */
 export const SORTABLE_COLUMNS = [
@@ -43,7 +44,9 @@ const optionalText = z
     if (typeof value !== 'string') return undefined;
     const trimmed = value.trim();
     return trimmed.length > 0 ? trimmed : undefined;
-  });
+  })
+  // zod 4 would otherwise type the key as required.
+  .optional();
 
 const clearableText = z.string().nullish();
 
@@ -51,16 +54,16 @@ const clearableText = z.string().nullish();
 const nullToUndefined = <T>(value: T | null | undefined) => value ?? undefined;
 
 export const createBookSchema = z.object({
-  title: z.string({ required_error: 'Title is required' }).trim().min(1, 'Title is required'),
-  author: z.string({ required_error: 'Author is required' }).trim().min(1, 'Author is required'),
+  title: z.string(required('Title is required')).trim().min(1, 'Title is required'),
+  author: z.string(required('Author is required')).trim().min(1, 'Author is required'),
   isbn: optionalText,
   publisher: optionalText,
   edition: optionalText,
-  publishedYear: publishedYear.transform(nullToUndefined),
-  pages: z.number().int().nullish().transform(nullToUndefined),
+  publishedYear: publishedYear.transform(nullToUndefined).optional(),
+  pages: z.number().int().nullish().transform(nullToUndefined).optional(),
   language: optionalText,
   description: optionalText,
-  rating: rating.transform(nullToUndefined),
+  rating: rating.transform(nullToUndefined).optional(),
   notes: optionalText,
   coverUrl: optionalText.pipe(coverUrlSchema.optional()),
 });
@@ -82,9 +85,7 @@ export const updateBookSchema = z.object({
 });
 
 export const updateBookStatusSchema = z.object({
-  status: z.nativeEnum(BookStatus, {
-    errorMap: () => ({ message: 'Invalid status. Use one of: to_read, reading, read' }),
-  }),
+  status: z.nativeEnum(BookStatus, { error: 'Invalid status. Use one of: to_read, reading, read' }),
 });
 
 export const bookIdParamsSchema = z.object({

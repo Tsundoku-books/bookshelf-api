@@ -34,7 +34,7 @@ describe('AppError hierarchy', () => {
   describe('ValidationError.fromZodError', () => {
     const schema = z.object({
       title: z.string().min(1, 'Title is required'),
-      nested: z.object({ pages: z.number({ invalid_type_error: 'Pages must be a number' }) }),
+      nested: z.object({ pages: z.number({ error: 'Pages must be a number' }) }),
     });
 
     it('lists every failing rule with its path and joins the messages', () => {

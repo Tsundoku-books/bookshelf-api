@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { CatalogBookStatus, CatalogReviewStatus } from './models/CatalogBook';
 import { RevisionStatus } from './models/CatalogRevision';
 import { coverUrlSchema } from '../../shared/coverUrl';
+import { required } from '../../shared/zodMessages';
 
 const page = z.coerce.number().int().positive().default(1);
 const limit = z.coerce.number().int().positive().max(100).default(20);
@@ -48,7 +49,7 @@ export const adminEditSchema = z
   .strict();
 
 export const visibilitySchema = z.object({
-  hidden: z.boolean({ required_error: 'hidden is required' }),
+  hidden: z.boolean(required('hidden is required')),
   reason: z.string().trim().max(500).optional(),
 });
 

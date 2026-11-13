@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { CompanyRole } from '../models/CompanyMember';
 import { isValidCnpj, normalizeCnpj } from './cnpj';
+import { required } from '../../../shared/zodMessages';
 
 export const BRAZILIAN_STATES = [
   'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA',
@@ -9,7 +10,7 @@ export const BRAZILIAN_STATES = [
 
 const requiredText = (label: string, max = 255) =>
   z
-    .string({ required_error: `${label} is required` })
+    .string(required(`${label} is required`))
     .trim()
     .min(1, `${label} is required`)
     .max(max, `${label} must have at most ${max} characters`);
@@ -23,7 +24,7 @@ const optionalText = (max: number) =>
     .transform(value => value || undefined);
 
 const cnpj = z
-  .string({ required_error: 'CNPJ is required' })
+  .string(required('CNPJ is required'))
   .transform(normalizeCnpj)
   .refine(isValidCnpj, { message: 'CNPJ is invalid' });
 
@@ -43,14 +44,14 @@ const address = z.object({
   district: requiredText('District', 100),
   city: requiredText('City', 100),
   state: z
-    .string({ required_error: 'State is required' })
+    .string(required('State is required'))
     .trim()
     .toUpperCase()
     .refine(value => (BRAZILIAN_STATES as readonly string[]).includes(value), {
       message: 'State must be a valid Brazilian state code',
     }),
   zip: z
-    .string({ required_error: 'ZIP code is required' })
+    .string(required('ZIP code is required'))
     .transform(value => value.replace(/\D/g, ''))
     .refine(value => value.length === 8, { message: 'ZIP code must have 8 digits' }),
 });
@@ -59,7 +60,7 @@ const companyFields = {
   legalName: requiredText('Legal name'),
   tradeName: optionalText(255),
   email: z
-    .string({ required_error: 'Email is required' })
+    .string(required('Email is required'))
     .trim()
     .toLowerCase()
     .email('Invalid email address'),
@@ -81,7 +82,7 @@ export const memberParamsSchema = z.object({
 
 export const addMemberSchema = z.object({
   email: z
-    .string({ required_error: 'Email is required' })
+    .string(required('Email is required'))
     .trim()
     .toLowerCase()
     .email('Invalid email address'),
@@ -89,7 +90,7 @@ export const addMemberSchema = z.object({
 });
 
 export const verificationSchema = z.object({
-  verified: z.boolean({ required_error: 'verified is required' }),
+  verified: z.boolean(required('verified is required')),
 });
 
 export type CreateCompanyInput = z.infer<typeof createCompanySchema>;
