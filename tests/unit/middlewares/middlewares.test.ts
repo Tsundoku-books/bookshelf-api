@@ -65,7 +65,7 @@ describe('authMiddleware', () => {
   });
 
   it('takes the roles from the database, not from the token', async () => {
-    accountState.mockResolvedValue({ id: 'user-9', roles: [Role.BUYER], status: UserStatus.ACTIVE, tokenVersion: 0 });
+    accountState.mockResolvedValue({ id: 'user-9', roles: [Role.BUYER], status: UserStatus.ACTIVE, tokenVersion: 0, enabledBugs: [] });
     const req = mockReq({ headers: { authorization: `Bearer ${signAuthToken('user-9', [Role.READER, Role.ADMIN])}` } });
 
     const next = await run(req);
@@ -84,7 +84,7 @@ describe('authMiddleware', () => {
   });
 
   it('rejects a token issued before the last password change', async () => {
-    accountState.mockResolvedValue({ id: 'u1', roles: [Role.READER], status: UserStatus.ACTIVE, tokenVersion: 2 });
+    accountState.mockResolvedValue({ id: 'u1', roles: [Role.READER], status: UserStatus.ACTIVE, tokenVersion: 2, enabledBugs: [] });
 
     const stale = await run(mockReq({ headers: { authorization: `Bearer ${signAuthToken('u1', [Role.READER], 1)}` } }));
     const fresh = await run(mockReq({ headers: { authorization: `Bearer ${signAuthToken('u1', [Role.READER], 2)}` } }));
@@ -94,7 +94,7 @@ describe('authMiddleware', () => {
   });
 
   it('rejects a suspended account even though its token is still valid', async () => {
-    accountState.mockResolvedValue({ id: 'u1', roles: [Role.READER], status: UserStatus.SUSPENDED, tokenVersion: 0 });
+    accountState.mockResolvedValue({ id: 'u1', roles: [Role.READER], status: UserStatus.SUSPENDED, tokenVersion: 0, enabledBugs: [] });
 
     const next = await run(mockReq({ headers: { authorization: `Bearer ${signAuthToken('u1')}` } }));
 

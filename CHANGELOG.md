@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Playground of bugs:** each user can switch on a few bugs for their own account (`GET` and `PUT /api/playground/bugs`, stored in `users.enabled_bugs`) to practice manual and automated testing. A bug only changes that account's own requests; the answer key is in [docs/playground-bugs.md](docs/playground-bugs.md).
 - **Terms acceptance:** `POST /api/auth/register` now requires `acceptTerms: true` and stores when and
   which version of the Terms of Service and Privacy Policy was accepted (`users.terms_accepted_at`,
   `users.terms_version`; NULL for accounts created before). **Breaking:** requests without it get 400.

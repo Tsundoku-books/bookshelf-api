@@ -9,6 +9,8 @@ declare global {
       /** Exact bytes of the body; kept only for the payment webhook, whose signature covers them. */
       rawBody?: Buffer;
       userRoles?: import('../../shared/roles').Role[];
+      /** Playground bug ids this account switched on (populated by `authMiddleware`). */
+      enabledBugs?: string[];
     }
   }
 }

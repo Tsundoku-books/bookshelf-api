@@ -65,6 +65,7 @@ describeMigrations('database migrations', () => {
       'AddMarketplaceAndPayments1790208000000',
       'AddTermsAcceptance1790294400000',
       'AddTokenVersion1790380800000',
+      'AddEnabledBugs1790467200000',
     ]);
 
     for (const metadata of db.entityMetadatas) {
@@ -95,7 +96,7 @@ describeMigrations('database migrations', () => {
     const initSql = fs.readFileSync(path.join(__dirname, '../../scripts/init-db.sql'), 'utf8');
     await db.query(initSql);
 
-    await expect(db.runMigrations()).resolves.toHaveLength(8);
+    await expect(db.runMigrations()).resolves.toHaveLength(9);
 
     const rows = await db.query(`SELECT count(*)::int AS total FROM books`);
     expect(rows[0].total).toBe(0);
@@ -145,7 +146,7 @@ describeMigrations('database migrations', () => {
     const db = await createScratchDatabase();
     await db.runMigrations();
 
-    for (let i = 0; i < 8; i++) await db.undoLastMigration();
+    for (let i = 0; i < 9; i++) await db.undoLastMigration();
 
     const tables: { table_name: string }[] = await db.query(
       `SELECT table_name FROM information_schema.tables

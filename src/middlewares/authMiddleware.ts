@@ -37,6 +37,7 @@ export const authMiddleware = async (req: Request, _res: Response, next: NextFun
 
     req.userId = account.id;
     req.userRoles = account.roles;
+    req.enabledBugs = account.enabledBugs;
     next();
   } catch (error) {
     next(error);

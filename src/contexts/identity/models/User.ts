@@ -51,6 +51,10 @@ export class User {
   @Column({ name: 'terms_version', type: 'varchar', length: 20, nullable: true })
   termsVersion!: string | null;
 
+  /** Playground bugs this user switched on for their own account (see the playground context). */
+  @Column({ name: 'enabled_bugs', type: 'text', array: true, default: () => "'{}'" })
+  enabledBugs!: string[];
+
   @OneToMany('Book', 'user')
   books!: unknown[];
 

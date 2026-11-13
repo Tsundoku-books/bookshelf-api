@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { bugOn } from '../../playground';
 import { BooksService } from './booksService';
 import { listBooksQuerySchema } from './booksSchemas';
 
@@ -7,11 +8,12 @@ const userId = (req: Request): string => req.userId as string;
 export const booksController = {
   async create(req: Request, res: Response) {
     const book = await BooksService.create(userId(req), req.body);
-    res.status(201).json({ message: 'Book created successfully', book });
+    res.status(bugOn(req, 'api-create-book-status-200') ? 200 : 201).json({ message: 'Book created successfully', book });
   },
 
   async list(req: Request, res: Response) {
     const query = listBooksQuerySchema.parse(req.query);
+    if (bugOn(req, 'api-slow-book-list')) await new Promise(resolve => setTimeout(resolve, 3000));
     const result = await BooksService.list(userId(req), query);
     res.json(result);
   },
