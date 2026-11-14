@@ -115,8 +115,9 @@ describe('playground bugs', () => {
 
   it('ignores the status filter with the bug on', async () => {
     const api = await signUp();
-    await api.createBook(TestDataBuilder.createBook({ status: 'read' }));
-    await api.createBook(TestDataBuilder.createBook({ status: 'to_read' }));
+    const finished = await api.createBook(TestDataBuilder.createBook());
+    await api.createBook(TestDataBuilder.createBook());
+    await api.updateBookStatus(finished.body.book.id, 'read');
 
     const normal = await api.getBooks({ status: 'read' });
     await enable(api, 'api-list-ignores-status-filter');
