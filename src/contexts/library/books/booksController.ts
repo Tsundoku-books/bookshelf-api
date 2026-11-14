@@ -14,7 +14,11 @@ export const booksController = {
   async list(req: Request, res: Response) {
     const query = listBooksQuerySchema.parse(req.query);
     if (bugOn(req, 'api-slow-book-list')) await new Promise(resolve => setTimeout(resolve, 3000));
-    const result = await BooksService.list(userId(req), query);
+    const effective = bugOn(req, 'api-list-ignores-status-filter') ? { ...query, status: undefined } : query;
+    const result = await BooksService.list(userId(req), effective);
+    if (bugOn(req, 'api-pagination-total-pages-floor')) {
+      result.pagination.totalPages = Math.floor(result.pagination.total / result.pagination.limit);
+    }
     res.json(result);
   },
 

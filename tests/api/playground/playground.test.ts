@@ -101,6 +101,31 @@ describe('playground bugs', () => {
     expect(Date.now() - startedAt).toBeGreaterThanOrEqual(2900);
   });
 
+  it('reports one page too few with the pagination bug on', async () => {
+    const api = await signUp();
+    for (let i = 0; i < 3; i++) await api.createBook(TestDataBuilder.createBook());
+
+    const normal = await api.getBooks({ limit: 2 });
+    await enable(api, 'api-pagination-total-pages-floor');
+    const buggy = await api.getBooks({ limit: 2 });
+
+    expect(normal.body.pagination.totalPages).toBe(2);
+    expect(buggy.body.pagination.totalPages).toBe(1);
+  });
+
+  it('ignores the status filter with the bug on', async () => {
+    const api = await signUp();
+    await api.createBook(TestDataBuilder.createBook({ status: 'read' }));
+    await api.createBook(TestDataBuilder.createBook({ status: 'to_read' }));
+
+    const normal = await api.getBooks({ status: 'read' });
+    await enable(api, 'api-list-ignores-status-filter');
+    const buggy = await api.getBooks({ status: 'read' });
+
+    expect(normal.body.books).toHaveLength(1);
+    expect(buggy.body.books).toHaveLength(2);
+  });
+
   it('never affects another account', async () => {
     const buggy = await signUp();
     const other = await signUp();

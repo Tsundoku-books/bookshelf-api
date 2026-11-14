@@ -11,6 +11,8 @@ The screen names the area and the layer of each bug but does not say what is wro
 | `api-create-book-status-200` | API | books | `POST /api/books` answers `200` instead of `201` | `booksController.create` |
 | `api-stats-total-off-by-one` | API | stats | `GET /api/stats` reports `total` one higher than the real number of books | `statsController.overview` |
 | `api-slow-book-list` | API | books | `GET /api/books` waits 3 seconds before answering | `booksController.list` |
+| `api-pagination-total-pages-floor` | API | books | `GET /api/books` reports `pagination.totalPages` rounded down, so the last partial page is missing | `booksController.list` |
+| `api-list-ignores-status-filter` | API | books | `GET /api/books?status=...` returns books of every status | `booksController.list` |
 | `ui-cover-without-alt` | UI | books | The cover images have an empty `alt`, so a screen reader announces nothing | `BookCover` |
 | `ui-dashboard-title-typo` | UI | dashboard | The "My Books" heading of the dashboard is misspelled | `DashboardPage` |
 

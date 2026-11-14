@@ -14,6 +14,8 @@ export const BUGS: readonly Bug[] = [
   { id: 'api-create-book-status-200', layer: 'api', area: 'books' },
   { id: 'api-stats-total-off-by-one', layer: 'api', area: 'stats' },
   { id: 'api-slow-book-list', layer: 'api', area: 'books' },
+  { id: 'api-pagination-total-pages-floor', layer: 'api', area: 'books' },
+  { id: 'api-list-ignores-status-filter', layer: 'api', area: 'books' },
   { id: 'ui-cover-without-alt', layer: 'ui', area: 'books' },
   { id: 'ui-dashboard-title-typo', layer: 'ui', area: 'dashboard' },
 ];
